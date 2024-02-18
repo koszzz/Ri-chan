@@ -147,39 +147,38 @@ async function meetLiyuu(msg_id, channel_id, author, timestamp, guild_id) {
                     }
                 }
 
+                // 如果需要开启看鲤任务
+                if (count < limit) {
+                    await new meetLiyuuModel({
+                        id: author,
+                        time: timestamp,
+                        guild_id,
+                    })
+                        .save()
+                        .then((dbRes) => {
+                            console.log(res.data);
+                            console.log("创建看鲤任务成功", dbRes);
+                        })
+                        .catch((err) => {
+                            console.log("创建看鲤任务失败", err);
+                        });
+                    await new dailyOperationsModel({
+                        id: author,
+                        guild_id,
+                    })
+                        .save()
+                        .catch((err) => {
+                            console.log("记录看鲤操作失败", err);
+                        });
+                }
+
                 meetLiyuuWithRetry(
                     channel_id,
                     `<@!${author}> 又来看鲤啦~\n${getContent(
                         count,
                         limit
                     )}\n多多看鲤，陶冶情操！`,
-                    msg_id,
-                    async (res) => {
-                        // 如果需要开启看鲤任务
-                        if (count < limit) {
-                            await new meetLiyuuModel({
-                                id: author,
-                                time: timestamp,
-                                guild_id,
-                            })
-                                .save()
-                                .then((dbRes) => {
-                                    console.log(res.data);
-                                    console.log("创建看鲤任务成功", dbRes);
-                                })
-                                .catch((err) => {
-                                    console.log("创建看鲤任务失败", err);
-                                });
-                            await new dailyOperationsModel({
-                                id: author,
-                                guild_id,
-                            })
-                                .save()
-                                .catch((err) => {
-                                    console.log("记录看鲤操作失败", err);
-                                });
-                        }
-                    }
+                    msg_id
                 );
             } catch (err) {
                 console.log("看鲤错误:", err);
