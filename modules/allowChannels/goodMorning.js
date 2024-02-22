@@ -38,6 +38,7 @@ async function setGoodMorning(
                     ).length == 0
                 ) {
                     await pushAllowedChannelId(
+                        null,
                         channel_id,
                         guild_id,
                         "goodMorning"
@@ -96,7 +97,7 @@ async function cancelGoodMorning(
                 image: "https://cdn.liyuu.ceek.fun/images/wara.jpg", //黑色T憨笑
             },
             async (res) => {
-                await canncelAllowedChannelId(channel_id, "goodMorning");
+                await canncelAllowedChannelId(channel_id, "goodMorning", null);
                 console.log(res.data);
             },
         ]);

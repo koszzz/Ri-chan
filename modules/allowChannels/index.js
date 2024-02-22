@@ -7,6 +7,7 @@ import {
     cancelGoodMorning,
     viewGoodMorning,
 } from "./goodMorning.js";
+import { pushAllowedChannelId, canncelAllowedChannelId } from "./publicApi.js";
 
 export default () => {
     ws.on("PUBLIC_GUILD_MESSAGES", (data) => {
@@ -62,6 +63,17 @@ export default () => {
                     viewGoodMorning(msg_id, channel_id, author, guildId);
                     break;
             }
+        }
+    });
+    ws.on("GROUP", (data) => {
+        if (data.eventType == "GROUP_ADD_ROBOT") {
+            const group_id = data.msg.group_openid;
+            pushAllowedChannelId(group_id, null, null, "goodMorning");
+            console.log("加入群聊");
+        } else if (data.eventType == "GROUP_DEL_ROBOT") {
+            const group_id = data.msg.group_openid;
+            canncelAllowedChannelId(null, "goodMorning", group_id);
+            console.log("退出群聊");
         }
     });
 };

@@ -1,11 +1,12 @@
-import { createOpenAPI, createWebsocket } from "qq-guild-bot";
+import { createOpenAPI, createWebsocket } from "qq-bot-sdk";
 import dotenv from "dotenv";
 dotenv.config({ path: "./.env" });
 
 const config = {
     appID: process.env.BOT_APPID,
     token: process.env.BOT_TOKEN,
-    intents: ["PUBLIC_GUILD_MESSAGES", "GUILDS"],
+    intents: ["PUBLIC_GUILD_MESSAGES", "GUILDS", "GROUP"],
+    sandbox: false,
 };
 
 // 创建client

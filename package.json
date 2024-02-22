@@ -17,7 +17,7 @@
     "node-cron": "^3.0.2",
     "node-fetch": "^3.3.1",
     "probe-image-size": "^7.2.3",
-    "qq-guild-bot": "^2.9.5",
+    "qq-bot-sdk": "^1.4.1",
     "rss-to-json": "^2.1.1"
   },
   "name": "ri-chan",

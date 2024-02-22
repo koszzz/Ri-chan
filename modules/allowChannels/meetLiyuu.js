@@ -35,6 +35,7 @@ async function setMeetLiyuu(
                         .length == 0
                 ) {
                     await pushAllowedChannelId(
+                        null,
                         channel_id,
                         guild_id,
                         "meetLiyuu"
@@ -91,7 +92,7 @@ async function cancelMeetLiyuu(
                 image: "https://cdn.liyuu.ceek.fun/images/wara.jpg", //黑色T憨笑
             },
             async (res) => {
-                await canncelAllowedChannelId(channel_id, "meetLiyuu");
+                await canncelAllowedChannelId(channel_id, "meetLiyuu", null);
                 console.log(res.data);
             },
         ]);
