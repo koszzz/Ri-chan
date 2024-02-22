@@ -27,7 +27,7 @@ const getPicture = async (group_id) => {
     if (group_id) {
         return await getFileInfo(group_id, url);
     }
-    return picture.url;
+    return url;
 };
 
 // 看鲤
@@ -220,7 +220,7 @@ async function meetLiyuu(
                 // 抛出错误
                 console.log(JSON.stringify({ retries, errors }));
                 return await meetLiyuuWithRetry(
-                    channel_id,
+                    destinationId,
                     content,
                     msg_id,
                     thenFunc,

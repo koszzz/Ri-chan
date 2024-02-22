@@ -5,7 +5,7 @@ dotenv.config({ path: "./.env" });
 const config = {
     appID: process.env.BOT_APPID,
     token: process.env.BOT_TOKEN,
-    intents: ["PUBLIC_GUILD_MESSAGES", "GUILDS", "GROUP"],
+    intents: ["PUBLIC_GUILD_MESSAGES", "GROUP"],
     sandbox: false,
 };
 
