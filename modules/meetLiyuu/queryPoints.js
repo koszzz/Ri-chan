@@ -57,7 +57,7 @@ async function queryPoints(
     const pointsRanking = await pointsModel.find(
         {
             guild_id: type == "guild" ? guild_id : null,
-            group: type == "group" ? destinationId : null,
+            group_id: type == "group" ? destinationId : null,
         },
         null,
         {
@@ -81,7 +81,7 @@ async function queryPoints(
                     };
                 } else if (type == "group") {
                     returnMain = {
-                        username: "[无法获取]",
+                        username: `[${i.id.slice(0, 7)}]`,
                         points: i.points,
                     };
                 }
@@ -146,7 +146,11 @@ async function queryPoints(
         {
             content:
                 (type == "guild" ? `<@!${author}> ` : "") +
-                `\n排名 | 昵称 | 积分\n-------------\n${rank} | ${userData.data.user.username} | ${points}\n-------------\n${rankingText}`,
+                `\n排名 | ${
+                    type == "guild" ? "昵称" : "ID"
+                } | 积分\n-------------\n${rank} | ${
+                    userData.data.user.username
+                } | ${points}\n-------------\n${rankingText}`,
             msg_id,
             msg_type: 0,
         },
