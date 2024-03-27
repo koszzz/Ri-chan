@@ -8,7 +8,7 @@ import {
     dailyOperationsModel,
     imagesModel,
 } from "../databaseModels.js";
-import getFileInfo from "../getFileInfo.js";
+import { getFileInfo } from "../getFileInfo.js";
 
 // 获取允许看鲤的子频道
 import { getAllowedChannelId } from "../allowChannels/publicApi.js";

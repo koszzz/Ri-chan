@@ -1,6 +1,6 @@
 import callWithRetry from "../callWithRetry.js";
 import postMessage from "../postMessage.js";
-import getFileInfo from "../getFileInfo.js";
+import { getFileInfo } from "../getFileInfo.js";
 
 async function hello(msg_id, destinationId, author, type = "guild") {
     callWithRetry(postMessage, [

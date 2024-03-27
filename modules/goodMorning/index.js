@@ -2,7 +2,7 @@ import * as cron from "node-cron";
 import { getAllowedChannelId } from "../allowChannels/publicApi.js";
 import callWithRetry from "../callWithRetry.js";
 import postMessage from "../postMessage.js";
-import getFileInfo from "../getFileInfo.js";
+import { getFileInfo } from "../getFileInfo.js";
 
 export default () => {
     cron.schedule("0 0 8 * * *", async () => {

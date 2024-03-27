@@ -6,7 +6,7 @@ const config = {
     appID: process.env.BOT_APPID,
     token: process.env.BOT_TOKEN,
     intents: ["PUBLIC_GUILD_MESSAGES", "GROUP"],
-    sandbox: false,
+    sandbox: true,
 };
 
 // 创建client
