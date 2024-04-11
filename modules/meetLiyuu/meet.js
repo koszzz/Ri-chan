@@ -25,7 +25,11 @@ const getPicture = async (group_id) => {
             console.log(err);
         });
     if (group_id) {
-        return await getFileInfo(group_id, url);
+        const file_info = await getFileInfo(group_id, url);
+        if (file_info == "") {
+            return await getPicture(group_id);
+        }
+        return file_info;
     }
     return url;
 };
