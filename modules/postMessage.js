@@ -28,7 +28,7 @@ async function postMessage(destinationId, message, func, type = "guild") {
     await apis[type](destinationId, message)
         .then(func)
         .catch((err) => {
-            if (JSON.stringify(err) != "{}") {
+            if (JSON.stringify(err) != "{}" && ![304023].includes(err.code)) {
                 throw err;
             }
         });

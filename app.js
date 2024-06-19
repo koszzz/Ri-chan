@@ -7,7 +7,7 @@ async function main() {
     allowChannels()
     goodMorning()
     meetLiyuu()
-    randomNumber()
+    // randomNumber()
 }
 try {
     main()
