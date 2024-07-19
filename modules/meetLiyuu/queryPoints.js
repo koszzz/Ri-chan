@@ -41,7 +41,13 @@ async function queryPoints(
                               meetLiyuuChannelId
                                   .map((i) => `<#${i.channel_id}>`)
                                   .join("")
-                    }可以查询积分~`,
+                    }可以查询积分~${
+                        meetLiyuuChannelId
+                            .map((i) => `<#${i.channel_id}>`)
+                            .join("") == ""
+                            ? "\n\n如果你是管理员的话，请使用“/设置看鲤子频”指令设置一个子频道用来看鲤吧～"
+                            : ""
+                    }`,
                     msg_id,
                     image: "https://cdn.liyuu.ceek.fun/images/dame.jpg", // 摇摇手指大咩哟
                 },

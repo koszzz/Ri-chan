@@ -28,6 +28,7 @@ const meetLiyuuModel = mongoose.model("meetLiyuus", meetLiyuuSchema);
 // 每天的看鲤操作记录
 const dailyOperationsSchema = new mongoose.Schema({
     id: String,
+    type: String,
     date: {
         type: Date,
         default: Date.now,
@@ -47,6 +48,16 @@ const imagesSchema = new mongoose.Schema({
 });
 const imagesModel = mongoose.model("images", imagesSchema);
 
+// 猜拳图片
+const rockPaperScissorsImagesSchema = new mongoose.Schema({
+    type: String,
+    url: String,
+});
+const rockPaperScissorsImagesModel = mongoose.model(
+    "rockpaperscissorsimages",
+    rockPaperScissorsImagesSchema
+);
+
 // 允许操作子频道列表
 const channelsSchema = new mongoose.Schema({
     group_id: String,
@@ -62,4 +73,5 @@ export {
     dailyOperationsModel,
     imagesModel,
     channelsModel,
+    rockPaperScissorsImagesModel,
 };

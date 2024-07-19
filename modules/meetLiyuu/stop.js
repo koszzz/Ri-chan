@@ -13,6 +13,23 @@ import { getAllowedChannelId } from "../allowChannels/publicApi.js";
 
 import { getFileInfo } from "../getFileInfo.js";
 
+/**
+ * 获取图片
+ * @param {string=} group_id 群聊id，不填返回原始url，填写后返回file_info
+ * @param {string} url url
+ * @returns {string} file_info或url
+ */
+const getPicture = async (group_id, url) => {
+    if (group_id) {
+        const file_info = await getFileInfo(group_id, url);
+        if (file_info == "") {
+            return await getPicture(group_id);
+        }
+        return file_info;
+    }
+    return url;
+};
+
 async function stopWatching(
     msg_id,
     destinationId,
@@ -44,7 +61,13 @@ async function stopWatching(
                               meetLiyuuChannelId
                                   .map((i) => `<#${i.channel_id}>`)
                                   .join("")
-                    }可以结束看鲤~`,
+                    }可以结束看鲤~${
+                        meetLiyuuChannelId
+                            .map((i) => `<#${i.channel_id}>`)
+                            .join("") == ""
+                            ? "\n\n如果你是管理员的话，请使用“/设置看鲤子频”指令设置一个子频道用来看鲤吧～"
+                            : ""
+                    }`,
                     msg_id,
                     image: "https://cdn.liyuu.ceek.fun/images/dame.jpg", // 摇摇手指大咩哟
                 },
@@ -63,6 +86,7 @@ async function stopWatching(
     // 获取当前看过鲤次数
     const count = await dailyOperationsModel.countDocuments({
         id: author,
+        type: "meetLiyuu",
         date: { $gte: new Date().setHours(0, 0, 0, 0) },
         guild_id: type == "guild" ? guild_id : null,
         group_id: type == "group" ? destinationId : null,
@@ -95,7 +119,7 @@ async function stopWatching(
                             : undefined, //比心
                     media:
                         type == "group"
-                            ? await getFileInfo(
+                            ? await getPicture(
                                   destinationId,
                                   "https://cdn.liyuu.ceek.fun/images/heart.jpg"
                               )
@@ -113,7 +137,11 @@ async function stopWatching(
                 {
                     content:
                         (type == "guild" ? `<@!${author}> ` : "") +
-                        `宝子~今天已经看满${limit}次鲤了~不再会开启计时任务了~\n请尽情“/看鲤”吧！\n多多看鲤，陶冶情操！`,
+                        `宝子~今天已经看满${limit}次鲤了~${
+                            type == "guild"
+                                ? `不再会开启计时任务了~\n请尽情“/看鲤”吧！`
+                                : "请明天再来吧！"
+                        }\n多多看鲤，陶冶情操！`,
                     msg_id,
                     msg_type: 7,
                     image:
@@ -122,7 +150,7 @@ async function stopWatching(
                             : undefined, //好
                     media:
                         type == "group"
-                            ? await getFileInfo(
+                            ? await getPicture(
                                   destinationId,
                                   "https://cdn.liyuu.ceek.fun/images/hao.jpg"
                               )
@@ -158,7 +186,7 @@ async function stopWatching(
                         : undefined, //白色卫衣Liyuu is watching you
                 media:
                     type == "group"
-                        ? await getFileInfo(
+                        ? await getPicture(
                               destinationId,
                               "https://cdn.liyuu.ceek.fun/images/whiteWaching.jpg"
                           )
@@ -225,7 +253,7 @@ async function stopWatching(
                     : undefined, //比心
             media:
                 type == "group"
-                    ? await getFileInfo(
+                    ? await getPicture(
                           destinationId,
                           "https://cdn.liyuu.ceek.fun/images/heart.jpg"
                       )

@@ -5,8 +5,8 @@ dotenv.config({ path: "./.env" });
 const config = {
     appID: process.env.BOT_APPID,
     token: process.env.BOT_TOKEN,
-    intents: ["PUBLIC_GUILD_MESSAGES", "GROUP"],
-    sandbox: true,
+    intents: ["PUBLIC_GUILD_MESSAGES", "GROUP_AND_C2C_EVENT"],
+    sandbox: false,
 };
 
 // 创建client

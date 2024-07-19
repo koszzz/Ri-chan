@@ -16,12 +16,18 @@ let files = {
  * @param {string} group_openid 群聊id
  * @param {string} url 图片url
  * @param {boolean=} forceUpdate 是否强制更新，默认false
+ * @param {boolean=} type 文件格式，默认1图片
  * @returns {Object}
  *     {
  *         "file_info": "CsMFErUDCp8DCuQBCoUBCKnyJBIgNDA2ZDgyMmFlYTllMmFjODA3Njk3YWEzMjg5MjZhZTMaKDUwYWRiZDhlNTlkNWRmZTYzMzc3MjUyYTJlMGUzNWY0ZWM0ZWM2ZjkiJDQwNmQ4MjJhZWE5ZTJhYzgwNzY5N2FhMzI4OTI2YWUzLnBuZyoFCAEQ6QcwxyA4wR1IARJKQ2dvek9EZzVNREV6TlRRekVoUlFyYjJPV2RYZjVqTjNKU291RGpYMDdFN0ctUmlwOGlRZ193b295UGUxNHFxeGhBTlFnTDJqQVEYASDCtcCuBiiAvaMBOP8KEqIBCmYvZG93bmxvYWQ/YXBwaWQ9MTQwNyZmaWxlaWQ9Q2dvek9EZzVNREV6TlRRekVoUlFyYjJPV2RYZjVqTjNKU291RGpYMDdFN0ctUmlwOGlRZ193b295UGUxNHFxeGhBTlFnTDJqQVESHwoHJnNwZWM9MBIJJnNwZWM9NzIwGgkmc3BlYz0xOTgaF211bHRpbWVkaWEubnQucXEuY29tLmNuKAEyD7AGAcAMAtIMBgjJhbPcAhIRCg3IPgLQPgLYPoO2h7sLUAEaiAISJDQwNmQ4MjJhZWE5ZTJhYzgwNzY5N2FhMzI4OTI2YWUzLnBuZziDtoe7C1DpB2oQQG2CKuqeKsgHaXqjKJJq46AB6QewAccguAHBHcgBqfIk0AEBkgKvAQgASgDyAacBL2Rvd25sb2FkP2FwcGlkPTE0MDcmZmlsZWlkPUNnb3pPRGc1TURFek5UUXpFaFJRcmIyT1dkWGY1ak4zSlNvdURqWDA3RTdHLVJpcDhpUWdfd29veVBlMTRxcXhoQU5RZ0wyakFRJnJrZXk9Q0FJU0tLU0Jla2pWRzFmTVQ0NGh1X0dyaE5sNTJiWXRYSDhmOGJJZDdJNDdRSmZ1YlJKNnRzTzBMNkEQAQ=="
  *     }
  */
-const getFileInfo = async (group_openid, url, forceUpdate = false) => {
+const getFileInfo = async (
+    group_openid,
+    url,
+    forceUpdate = false,
+    type = 1
+) => {
     // 如果还有60s的有效期，或无限期
     if (
         !forceUpdate &&
@@ -45,7 +51,7 @@ const getFileInfo = async (group_openid, url, forceUpdate = false) => {
                     srv_send_msg: false, // 设置为 false 不发送到目标端，仅拿到文件信息
                 })
                 .then((res) => res.data),
-        [1, url, group_openid]
+        [type, url, group_openid]
     ).then((result) => result?.result ?? "exit");
     if (fileRes == "exit") {
         return { file_info: "" };

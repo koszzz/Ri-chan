@@ -17,7 +17,7 @@ export default () => {
             const content = data.msg.content;
             const guildId = data.msg.guild_id;
 
-            switch (getAction(content)) {
+            switch (getAction(content, "guild")) {
                 case "结束看鲤":
                     stopWatching(msg_id, channel_id, author, guildId, "guild");
                     break;
@@ -47,7 +47,7 @@ export default () => {
             }
         }
     });
-    ws.on("GROUP", (data) => {
+    ws.on("GROUP_AND_C2C_EVENT", (data) => {
         if (data.eventType == "GROUP_AT_MESSAGE_CREATE") {
             const author = data.msg.author.member_openid;
             const authorName = "您";
@@ -56,7 +56,7 @@ export default () => {
             const content = data.msg.content;
             const timestamp = data.msg.timestamp;
 
-            switch (getAction(content)) {
+            switch (getAction(content, "group")) {
                 case "结束看鲤":
                     stopWatching(msg_id, group_id, author, group_id, "group");
                     break;

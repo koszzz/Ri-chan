@@ -2,6 +2,7 @@ import callWithRetry from "../callWithRetry.js";
 import postMessage from "../postMessage.js";
 import sleep from "../sleep.js";
 import dayjs from "dayjs";
+import { isInTheAllowedTime } from "../isInTheAllowedTime.js";
 // 引入mongodbModels
 import {
     meetLiyuuModel,
@@ -13,17 +14,28 @@ import { getFileInfo } from "../getFileInfo.js";
 // 获取允许看鲤的子频道
 import { getAllowedChannelId } from "../allowChannels/publicApi.js";
 
-const getPicture = async (group_id) => {
-    const url = await imagesModel
-        .countDocuments()
-        .then((count) => {
-            const randomIndex = Math.floor(Math.random() * count);
-            return imagesModel.findOne().skip(randomIndex).exec();
-        })
-        .then((res) => res.url)
-        .catch((err) => {
-            console.log(err);
-        });
+/**
+ * 获取图片
+ * @param {string=} group_id 群聊id，不填返回原始url，填写后返回file_info
+ * @param {string=} specifyUrl url，不填随机鲤鱼图片
+ * @returns {string} file_info或url
+ */
+const getPicture = async (group_id, specifyUrl) => {
+    let url;
+    if (specifyUrl) {
+        url = specifyUrl;
+    } else {
+        url = await imagesModel
+            .countDocuments()
+            .then((count) => {
+                const randomIndex = Math.floor(Math.random() * count);
+                return imagesModel.findOne().skip(randomIndex).exec();
+            })
+            .then((res) => res.url)
+            .catch((err) => {
+                console.log(err);
+            });
+    }
     if (group_id) {
         const file_info = await getFileInfo(group_id, url);
         if (file_info == "") {
@@ -67,7 +79,9 @@ async function meetLiyuu(
                               meetLiyuuChannelId
                                   .map((i) => `<#${i.channel_id}>`)
                                   .join("")
-                    }可以看鲤~`,
+                    }可以看鲤~${meetLiyuuChannelId
+                        .map((i) => `<#${i.channel_id}>`)
+                        .join("") == ""?'\n\n如果你是管理员的话，请使用“/设置看鲤子频”指令设置一个子频道用来看鲤吧～':''}`,
                     msg_id,
                     image: "https://cdn.liyuu.ceek.fun/images/dame.jpg", // 摇摇手指大咩哟
                 },
@@ -79,6 +93,31 @@ async function meetLiyuu(
             return;
         }
     }
+
+    // 时间限制
+    if (
+        !isInTheAllowedTime(destinationId) &&
+        type == "group"
+    ) {
+        callWithRetry(postMessage, [
+            destinationId,
+            {
+                content: `\n当前不在可用看鲤时间\n请在北京时间 00:00～09:00、17:00～18:00 来看鲤哦～${
+                    destinationId == "DA863706233CF44DCB4B8EE105101591"
+                        ? `\n频道看鲤无限制，常回频道看看~（子频道 🤖 | 每日打卡 看鲤）`
+                        : ""
+                }`,
+                msg_id,
+                msg_type: 0,
+            },
+            (res) => {
+                console.log(res.data);
+            },
+            type,
+        ]);
+        return;
+    }
+
     // 获取看鲤所需时间
     const meetLiyuuTimeout = 5;
 
@@ -121,7 +160,7 @@ async function meetLiyuu(
                             : undefined, //？
                     media:
                         type == "group"
-                            ? await getFileInfo(
+                            ? await getPicture(
                                   destinationId,
                                   "https://cdn.liyuu.ceek.fun/images/wenhao.jpg"
                               )
@@ -148,7 +187,7 @@ async function meetLiyuu(
                         : undefined, //指人
                 media:
                     type == "group"
-                        ? await getFileInfo(
+                        ? await getPicture(
                               destinationId,
                               "https://cdn.liyuu.ceek.fun/images/zhiren.jpg"
                           )
@@ -164,6 +203,7 @@ async function meetLiyuu(
     // 获取此前看鲤记录数量
     const count = await dailyOperationsModel.countDocuments({
         id: author,
+        type: "meetLiyuu",
         date: { $gte: new Date().setHours(0, 0, 0, 0) },
         guild_id: type == "guild" ? guild_id : null,
         group_id: type == "group" ? destinationId : null,
@@ -173,7 +213,11 @@ async function meetLiyuu(
     const getContent = (count, limit) => {
         // 如果加上这次看鲤已经达到上限
         if (count == limit - 1) {
-            return `${meetLiyuuTimeout}分钟后记得发送“/结束看鲤”\n今日已看满${limit}次鲤，接下来的看鲤都不会加积分哦~`;
+            return `${meetLiyuuTimeout}分钟后记得发送“/结束看鲤”\n今日已看满${limit}次鲤，${
+                type == "guild"
+                    ? "接下来的看鲤都不会加积分哦～"
+                    : "请明天再来吧～"
+            }`;
             // 如果已经超过上限
         } else if (count >= limit) {
             return `本次看鲤将不会增加积分哦~`;
@@ -184,6 +228,31 @@ async function meetLiyuu(
             }次看鲤机会`;
         }
     };
+
+    // 群聊拦截
+    if (count >= limit && type == "group") {
+        callWithRetry(postMessage, [
+            destinationId,
+            {
+                content: `\n今天已经看满${limit}次鲤了，请明天再来哦～${
+                    destinationId == "DA863706233CF44DCB4B8EE105101591"
+                        ? `\n频道看鲤无上限，常回频道看看~（子频道 🤖 | 每日打卡 看鲤）`
+                        : ""
+                }`,
+                msg_id,
+                msg_type: 7,
+                media: await getPicture(
+                    destinationId,
+                    "https://i0.hdslb.com/bfs/new_dyn/d9334afd367cf2c2b03b80f49485621b35611279.jpg@150w_150h.jpg"
+                ),
+            },
+            (res) => {
+                console.log(res.data);
+            },
+            type,
+        ]);
+        return;
+    }
 
     async function meetLiyuuWithRetry(
         destinationId,
@@ -255,6 +324,7 @@ async function meetLiyuu(
             });
         await new dailyOperationsModel({
             id: author,
+            type: "meetLiyuu",
             guild_id: type == "guild" ? guild_id : null,
             group_id: type == "group" ? destinationId : null,
         })
